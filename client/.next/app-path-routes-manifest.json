@@ -3,6 +3,7 @@
   "/_global-error/page": "/_global-error",
   "/favicon.ico/route": "/favicon.ico",
   "/admin/page": "/admin",
+  "/admin/login/page": "/admin/login",
   "/jobs/[id]/page": "/jobs/[id]",
   "/page": "/"
 }

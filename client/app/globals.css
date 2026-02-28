@@ -4,12 +4,14 @@
   --background: #ffffff;
   --foreground: #1f2350;
   --color-accent: #5c58f8;
+  --color-accent-deep: #4540f0;
   --color-accent-strong: #4540f0;
   --color-accent-soft: #ebe9ff;
   --color-blue: #2aa7ff;
   --color-muted: #878cab;
   --color-line: #e8ebf7;
   --color-surface: #f6f7ff;
+  --color-ink: #18203f;
   --color-footer: #11182f;
   --font-body: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --font-display: "Trebuchet MS", "Segoe UI", sans-serif;

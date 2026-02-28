@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useState } from "react";
 import { fetchJobMeta, fetchJobs } from "@/lib/api";
@@ -295,13 +296,32 @@ export function JobsHomePage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#f7f7fe_0%,#eef0ff_100%)] px-6 py-8">
+          <div className="relative overflow-hidden rounded-[32px] border border-[var(--color-line)] bg-[linear-gradient(135deg,#f7f7fe_0%,#eef0ff_100%)] px-6 py-8">
             <div className="absolute left-8 top-8 h-32 w-32 rounded-[28px] border border-[var(--color-line)]" />
             <div className="absolute right-10 top-6 h-44 w-44 rounded-[36px] border border-[var(--color-line)]" />
             <div className="absolute bottom-8 left-6 h-24 w-24 rounded-full border border-[var(--color-line)]" />
 
             <div className="relative mx-auto flex min-h-[430px] max-w-md items-center justify-center">
               <div className="absolute inset-x-10 bottom-2 h-[310px] rounded-[44px] bg-[linear-gradient(180deg,rgba(92,88,248,0.18),rgba(42,167,255,0.1))]" />
+              <div className="absolute inset-x-8 top-6 bottom-8 overflow-hidden rounded-[44px] border border-white/60 bg-white/55 shadow-[0_30px_70px_rgba(41,47,88,0.12)]">
+                <Image
+                  src="/quickhire-reference.svg"
+                  alt="QuickHire interface reference artwork"
+                  fill
+                  priority
+                  className="object-cover object-[76%_0%]"
+                  sizes="(min-width: 1024px) 420px, 100vw"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(247,247,254,0.55)_0%,rgba(247,247,254,0.05)_38%,rgba(247,247,254,0)_100%)]" />
+                <div className="absolute bottom-5 left-5 rounded-[20px] bg-white/92 px-4 py-3 shadow-[0_16px_30px_rgba(41,47,88,0.08)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                    Visual match
+                  </p>
+                  <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-foreground)]">
+                    Reference-aligned hero
+                  </p>
+                </div>
+              </div>
               <div className="absolute right-0 top-12 rounded-2xl bg-white px-4 py-3 shadow-[0_20px_35px_rgba(41,47,88,0.1)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                   Shortlist
@@ -318,23 +338,7 @@ export function JobsHomePage() {
                   Senior Designer
                 </p>
               </div>
-              <div className="relative flex h-[340px] w-[260px] items-center justify-center rounded-[48px] bg-[linear-gradient(180deg,#dfe6ff_0%,#ffffff_100%)] shadow-[0_40px_60px_rgba(41,47,88,0.15)]">
-                <div className="absolute inset-x-10 top-8 h-16 rounded-full bg-white/90" />
-                <div className="absolute inset-x-7 top-24 h-24 rounded-[28px] bg-white/95" />
-                <div className="flex h-36 w-36 items-center justify-center rounded-full bg-[linear-gradient(180deg,#5c58f8_0%,#2aa7ff_100%)] text-center font-[family-name:var(--font-display)] text-xl font-semibold text-white shadow-[0_20px_45px_rgba(92,88,248,0.35)]">
-                  Top
-                  <br />
-                  Talent
-                </div>
-                <div className="absolute inset-x-8 bottom-8 rounded-[24px] bg-white/95 px-5 py-4 text-left shadow-[0_14px_30px_rgba(41,47,88,0.08)]">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                    Candidate Ready
-                  </p>
-                  <p className="mt-2 font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-foreground)]">
-                    Apply in minutes
-                  </p>
-                </div>
-              </div>
+              <div className="pointer-events-none relative h-[340px] w-[260px]" />
             </div>
           </div>
         </section>

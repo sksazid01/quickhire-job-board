@@ -3,6 +3,7 @@
   "/_global-error/page": "app/_global-error/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/admin/page": "app/admin/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
   "/jobs/[id]/page": "app/jobs/[id]/page.js",
   "/page": "app/page.js"
 }

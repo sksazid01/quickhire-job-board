@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import { createJob, deleteJob, fetchJobs } from "@/lib/api";
 import { clearAdminSession, isAdminAuthenticated } from "@/lib/auth";
 import type { Job, JobPayload } from "@/lib/types";
@@ -20,22 +20,23 @@ const initialFormState: JobPayload = {
 
 export function AdminPage() {
   const router = useRouter();
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [formState, setFormState] = useState<JobPayload>(initialFormState);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const isAuthenticated = useSyncExternalStore(
+    () => () => {},
+    () => isAdminAuthenticated(),
+    () => false
+  );
 
-  // Auth guard — redirect to login if not authenticated
   useEffect(() => {
-    if (!isAdminAuthenticated()) {
+    if (!isAuthenticated) {
       router.replace("/admin/login");
-    } else {
-      setIsAuthChecked(true);
     }
-  }, [router]);
+  }, [isAuthenticated, router]);
 
   function handleLogout() {
     clearAdminSession();
@@ -111,7 +112,7 @@ export function AdminPage() {
     <div className="min-h-screen pb-16">
       <SiteHeader />
 
-      {!isAuthChecked ? (
+      {!isAuthenticated ? (
         <div className="flex min-h-[60vh] items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-black/10 border-t-[var(--color-accent)]" />
         </div>
