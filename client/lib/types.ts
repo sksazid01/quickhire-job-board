@@ -15,11 +15,14 @@ export type JobFilters = {
   search: string;
   category: string;
   location: string;
+  employment_type: string;
+  sort: "newest" | "oldest" | "applications" | "";
 };
 
 export type JobMeta = {
   categories: string[];
   locations: string[];
+  employment_types: string[];
 };
 
 export type JobPayload = {

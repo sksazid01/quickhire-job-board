@@ -1,57 +1,63 @@
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function requireText(value, fieldName) {
+function requireText(value, fieldName, key) {
   if (typeof value !== "string" || !value.trim()) {
-    return `${fieldName} is required.`;
+    return { message: `${fieldName} is required.`, key };
   }
-
   return null;
 }
 
-function requireUrl(value, fieldName) {
+function requireUrl(value, fieldName, key) {
   if (typeof value !== "string" || !value.trim()) {
-    return `${fieldName} is required.`;
+    return { message: `${fieldName} is required.`, key };
   }
-
   try {
     new URL(value);
     return null;
   } catch {
-    return `${fieldName} must be a valid URL.`;
+    return { message: `${fieldName} must be a valid URL.`, key };
   }
 }
 
 export function validateJobPayload(payload) {
-  const errors = [
-    requireText(payload.title, "Title"),
-    requireText(payload.company, "Company"),
-    requireText(payload.location, "Location"),
-    requireText(payload.category, "Category"),
-    requireText(payload.description, "Description"),
-    requireText(payload.employment_type, "Employment type"),
-    requireText(payload.salary_range, "Salary range"),
+  const rawErrors = [
+    requireText(payload.title, "Title", "title"),
+    requireText(payload.company, "Company", "company"),
+    requireText(payload.location, "Location", "location"),
+    requireText(payload.category, "Category", "category"),
+    requireText(payload.description, "Description", "description"),
+    requireText(payload.employment_type, "Employment type", "employment_type"),
+    requireText(payload.salary_range, "Salary range", "salary_range"),
   ].filter(Boolean);
+
+  const fieldErrors = Object.fromEntries(rawErrors.map((e) => [e.key, e.message]));
+  const errors = rawErrors.map((e) => e.message);
 
   return {
     isValid: errors.length === 0,
     errors,
+    fieldErrors,
   };
 }
 
 export function validateApplicationPayload(payload) {
-  const errors = [
-    requireText(payload.name, "Name"),
-    requireText(payload.email, "Email"),
-    requireUrl(payload.resume_link, "Resume link"),
-    requireText(payload.cover_note, "Cover note"),
+  const rawErrors = [
+    requireText(payload.name, "Name", "name"),
+    requireText(payload.email, "Email", "email"),
+    requireUrl(payload.resume_link, "Resume link", "resume_link"),
+    requireText(payload.cover_note, "Cover note", "cover_note"),
   ].filter(Boolean);
 
   if (payload.email && !emailPattern.test(payload.email.trim())) {
-    errors.push("Email must be properly formatted.");
+    rawErrors.push({ message: "Email must be properly formatted.", key: "email" });
   }
+
+  const fieldErrors = Object.fromEntries(rawErrors.map((e) => [e.key, e.message]));
+  const errors = rawErrors.map((e) => e.message);
 
   return {
     isValid: errors.length === 0,
     errors,
+    fieldErrors,
   };
 }

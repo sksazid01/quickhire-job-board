@@ -6,6 +6,8 @@ export const config = {
   port: Number(process.env.PORT || 4000),
   databaseUrl: process.env.DATABASE_URL,
   corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  nodeEnv: process.env.NODE_ENV || "development",
+  requestTimeout: Number(process.env.REQUEST_TIMEOUT || 10000),
 };
 
 if (!config.databaseUrl) {

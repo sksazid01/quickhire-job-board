@@ -152,7 +152,10 @@ export function JobsHomePage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
+  const [employmentType, setEmploymentType] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest" | "applications" | "">("newest");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState("");
   const deferredSearch = useDeferredValue(search);
 
@@ -180,11 +183,13 @@ export function JobsHomePage() {
         search: deferredSearch,
         category,
         location,
+        employment_type: employmentType,
+        sort,
       },
       controller.signal
     )
-      .then((data) => {
-        setJobs(data);
+      .then(({ jobs: fetched }) => {
+        setJobs(fetched);
         setError("");
       })
       .catch((requestError) => {
@@ -202,11 +207,12 @@ export function JobsHomePage() {
       .finally(() => {
         if (!controller.signal.aborted) {
           setIsLoading(false);
+          setIsSearching(false);
         }
       });
 
     return () => controller.abort();
-  }, [category, deferredSearch, location]);
+  }, [category, deferredSearch, employmentType, location, sort]);
 
   const categoryCards = getCategoryCards(meta, jobs);
   const featuredJobs = jobs.slice(0, 8);
@@ -246,11 +252,16 @@ export function JobsHomePage() {
                   value={search}
                   onChange={(event) => {
                     setIsLoading(true);
+                    setIsSearching(true);
                     setError("");
                     setSearch(event.target.value);
                   }}
                   placeholder="Job title or keyword"
-                  className="rounded-2xl border border-[var(--color-line)] px-4 py-3.5 text-sm outline-none transition focus:border-[var(--color-accent)]"
+                  className={`rounded-2xl border px-4 py-3.5 text-sm outline-none transition focus:border-[var(--color-accent)] ${
+                    isSearching
+                      ? "animate-pulse border-[var(--color-accent)]"
+                      : "border-[var(--color-line)]"
+                  }`}
                 />
                 <select
                   value={location}
@@ -372,6 +383,7 @@ export function JobsHomePage() {
                 setSearch("");
                 setCategory("");
                 setLocation("");
+                setEmploymentType("");
               }}
               className="text-sm font-semibold text-[var(--color-accent)]"
             >
@@ -391,6 +403,7 @@ export function JobsHomePage() {
                     setIsLoading(true);
                     setError("");
                     setCategory(item.name);
+                    setEmploymentType("");
                   }}
                   className={`rounded-[24px] border p-6 text-left transition hover:-translate-y-1 ${
                     isHighlighted
@@ -504,10 +517,62 @@ export function JobsHomePage() {
                 Featured jobs
               </h2>
             </div>
-            <Link href="/admin" className="text-sm font-semibold text-[var(--color-accent)]">
-              Post a new job
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={employmentType}
+                onChange={(e) => { setIsLoading(true); setEmploymentType(e.target.value); }}
+                className="rounded-2xl border border-[var(--color-line)] bg-white px-3 py-2 text-sm outline-none transition focus:border-[var(--color-accent)]"
+              >
+                <option value="">All types</option>
+                {(meta.employment_types.length
+                  ? meta.employment_types
+                  : ["Full-time", "Part-time", "Contract", "Internship", "Remote"]
+                ).map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <select
+                value={sort}
+                onChange={(e) => { setIsLoading(true); setSort(e.target.value as typeof sort); }}
+                className="rounded-2xl border border-[var(--color-line)] bg-white px-3 py-2 text-sm outline-none transition focus:border-[var(--color-accent)]"
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="applications">Most applications</option>
+              </select>
+              <Link href="/admin" className="text-sm font-semibold text-[var(--color-accent)]">
+                Post a new job
+              </Link>
+            </div>
           </div>
+
+          {/* Active filter chips */}
+          {(category || location || employmentType || search) ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">Active:</span>
+              {search ? (
+                <button type="button" onClick={() => { setIsLoading(true); setSearch(""); }} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent)] transition hover:bg-red-100 hover:text-red-600">
+                  &ldquo;{search}&rdquo; <span aria-hidden>×</span>
+                </button>
+              ) : null}
+              {category ? (
+                <button type="button" onClick={() => { setIsLoading(true); setCategory(""); }} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent)] transition hover:bg-red-100 hover:text-red-600">
+                  {category} <span aria-hidden>×</span>
+                </button>
+              ) : null}
+              {location ? (
+                <button type="button" onClick={() => { setIsLoading(true); setLocation(""); }} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent)] transition hover:bg-red-100 hover:text-red-600">
+                  {location} <span aria-hidden>×</span>
+                </button>
+              ) : null}
+              {employmentType ? (
+                <button type="button" onClick={() => { setIsLoading(true); setEmploymentType(""); }} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--color-accent)] transition hover:bg-red-100 hover:text-red-600">
+                  {employmentType} <span aria-hidden>×</span>
+                </button>
+              ) : null}
+              <button type="button" onClick={() => { setIsLoading(true); setSearch(""); setCategory(""); setLocation(""); setEmploymentType(""); }} className="text-xs font-semibold text-[var(--color-muted)] hover:text-red-600">
+                Clear all
+              </button>
+            </div>
+          ) : null}
 
           {error ? (
             <div className="mt-8 rounded-[24px] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">

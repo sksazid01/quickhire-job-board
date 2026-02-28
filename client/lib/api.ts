@@ -47,14 +47,23 @@ async function request<T>(path: string, init?: RequestInit) {
 }
 
 export async function fetchJobs(filters: JobFilters, signal?: AbortSignal) {
-  const url = buildUrl("/api/jobs", filters);
+  const params: Record<string, string> = {};
+  if (filters.search) params.search = filters.search;
+  if (filters.category) params.category = filters.category;
+  if (filters.location) params.location = filters.location;
+  if (filters.employment_type) params.employment_type = filters.employment_type;
+  if (filters.sort) params.sort = filters.sort;
+
+  const url = buildUrl("/api/jobs", params);
   const response = await fetch(url, { signal, cache: "no-store" });
 
   if (!response.ok) {
     throw new Error("Unable to load job listings.");
   }
 
-  return (await response.json()) as Job[];
+  const data = (await response.json()) as Job[];
+  const total = response.headers.get("X-Total-Count");
+  return { jobs: data, total: total ? Number(total) : data.length };
 }
 
 export async function fetchJob(jobId: string, signal?: AbortSignal) {
