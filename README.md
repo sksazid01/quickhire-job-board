@@ -1,5 +1,7 @@
 # QuickHire Job Board
 
+[![Watch the Demo on YouTube](https://img.shields.io/badge/Watch%20Demo-YouTube-red?logo=youtube)](https://youtu.be/hF60jNwiJtQ)
+
 QuickHire is a full-stack job board built for the take-home task using:
 
 - `Next.js 16` for the frontend
