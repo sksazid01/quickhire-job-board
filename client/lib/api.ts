@@ -6,6 +6,16 @@ import type {
   JobPayload,
 } from "@/lib/types";
 
+export class ApiError extends Error {
+  fieldErrors: Record<string, string>;
+
+  constructor(message: string, fieldErrors: Record<string, string> = {}) {
+    super(message);
+    this.name = "ApiError";
+    this.fieldErrors = fieldErrors;
+  }
+}
+
 const API_BASE_URL =
   (() => {
     const rawValue = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
@@ -73,8 +83,9 @@ async function request<T>(path: string, init?: RequestInit) {
   if (!response.ok) {
     const message =
       data?.errors?.join(" ") || data?.message || "Request failed. Please try again.";
+    const fieldErrors: Record<string, string> = data?.fields || {};
 
-    throw new Error(message);
+    throw new ApiError(message, fieldErrors);
   }
 
   return data as T;
@@ -141,16 +152,21 @@ export function fetchJobMeta(signal?: AbortSignal) {
   });
 }
 
+const ADMIN_KEY =
+  process.env.NEXT_PUBLIC_ADMIN_KEY || "quickhire-admin-secret";
+
 export function createJob(payload: JobPayload) {
   return request<Job>("/api/jobs", {
     method: "POST",
     body: JSON.stringify(payload),
+    headers: { "X-Admin-Key": ADMIN_KEY },
   });
 }
 
 export async function deleteJob(jobId: number) {
   await request<void>(`/api/jobs/${jobId}`, {
     method: "DELETE",
+    headers: { "X-Admin-Key": ADMIN_KEY },
   });
 }
 

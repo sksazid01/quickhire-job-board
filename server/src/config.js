@@ -8,6 +8,7 @@ export const config = {
   corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3000",
   nodeEnv: process.env.NODE_ENV || "development",
   requestTimeout: Number(process.env.REQUEST_TIMEOUT || 10000),
+  adminSecret: process.env.ADMIN_SECRET || "quickhire-admin-secret",
 };
 
 if (!config.databaseUrl) {
