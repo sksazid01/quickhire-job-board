@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { submitApplication } from "@/lib/api";
+import { ApiError, submitApplication } from "@/lib/api";
 
 type ApplicationFormProps = {
   jobId: number;
@@ -17,6 +17,7 @@ const initialFormState = {
 export function ApplicationForm({ jobId }: ApplicationFormProps) {
   const [formState, setFormState] = useState(initialFormState);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -28,15 +29,26 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
       });
 
       setFormState(initialFormState);
+      setFieldErrors({});
       setSuccessMessage("Application submitted successfully.");
       setError("");
     } catch (submissionError) {
       setSuccessMessage("");
-      setError(
-        submissionError instanceof Error
-          ? submissionError.message
-          : "Unable to submit application."
-      );
+      if (submissionError instanceof ApiError) {
+        setFieldErrors(submissionError.fieldErrors);
+        setError(
+          Object.keys(submissionError.fieldErrors).length > 0
+            ? ""
+            : submissionError.message
+        );
+      } else {
+        setFieldErrors({});
+        setError(
+          submissionError instanceof Error
+            ? submissionError.message
+            : "Unable to submit application."
+        );
+      }
     }
   }
 
@@ -46,11 +58,7 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
       onSubmit={(event) => {
         event.preventDefault();
         setError("");
-        setSuccessMessage("");
-
-        startTransition(() => {
-          void sendApplication();
-        });
+        setFieldErrors({});
       }}
     >
       <div className="space-y-2">
@@ -75,10 +83,15 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
             onChange={(event) =>
               setFormState((current) => ({ ...current, name: event.target.value }))
             }
-            className="w-full rounded-2xl border border-black/10 bg-[var(--color-surface)] px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"
+            className={`w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[var(--color-accent)] ${
+              fieldErrors.name ? "border-red-400 bg-red-50" : "border-black/10 bg-[var(--color-surface)]"
+            }`}
             placeholder="Alex Carter"
             required
           />
+          {fieldErrors.name && (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.name}</p>
+          )}
         </label>
 
         <label className="space-y-2 text-sm font-medium text-[var(--color-foreground)]">
@@ -89,10 +102,15 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
             onChange={(event) =>
               setFormState((current) => ({ ...current, email: event.target.value }))
             }
-            className="w-full rounded-2xl border border-black/10 bg-[var(--color-surface)] px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"
+            className={`w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[var(--color-accent)] ${
+              fieldErrors.email ? "border-red-400 bg-red-50" : "border-black/10 bg-[var(--color-surface)]"
+            }`}
             placeholder="alex@company.com"
             required
           />
+          {fieldErrors.email && (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.email}</p>
+          )}
         </label>
 
         <label className="space-y-2 text-sm font-medium text-[var(--color-foreground)]">
@@ -106,10 +124,15 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
                 resume_link: event.target.value,
               }))
             }
-            className="w-full rounded-2xl border border-black/10 bg-[var(--color-surface)] px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"
+            className={`w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[var(--color-accent)] ${
+              fieldErrors.resume_link ? "border-red-400 bg-red-50" : "border-black/10 bg-[var(--color-surface)]"
+            }`}
             placeholder="https://portfolio.example/resume"
             required
           />
+          {fieldErrors.resume_link && (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.resume_link}</p>
+          )}
         </label>
 
         <label className="space-y-2 text-sm font-medium text-[var(--color-foreground)]">
@@ -122,10 +145,15 @@ export function ApplicationForm({ jobId }: ApplicationFormProps) {
                 cover_note: event.target.value,
               }))
             }
-            className="min-h-36 w-full rounded-2xl border border-black/10 bg-[var(--color-surface)] px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"
+            className={`min-h-36 w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[var(--color-accent)] ${
+              fieldErrors.cover_note ? "border-red-400 bg-red-50" : "border-black/10 bg-[var(--color-surface)]"
+            }`}
             placeholder="Tell us why this role is a strong fit."
             required
           />
+          {fieldErrors.cover_note && (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.cover_note}</p>
+          )}
         </label>
       </div>
 
