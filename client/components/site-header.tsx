@@ -2,36 +2,43 @@ import Link from "next/link";
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-black/8 bg-white/70 backdrop-blur-sm">
+    <header className="border-b border-[var(--color-line)] bg-white/96">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-accent)] font-[family-name:var(--font-display)] text-lg font-semibold text-white">
-            Q
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] font-[family-name:var(--font-display)] text-sm font-semibold text-white shadow-[0_12px_24px_rgba(92,88,248,0.28)]">
+            QH
           </span>
-          <div>
-            <p className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-foreground)]">
-              QuickHire
-            </p>
-            <p className="text-sm text-[var(--color-muted)]">
-              Modern hiring for fast-moving teams
-            </p>
-          </div>
+          <span className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-foreground)]">
+            QuickHire
+          </span>
         </Link>
 
-        <nav className="flex flex-wrap items-center gap-3 text-sm font-semibold text-[var(--color-muted)]">
+        <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-[var(--color-muted)]">
+          <Link href="/#featured-jobs" className="transition hover:text-[var(--color-accent)]">
+            Find Job
+          </Link>
+          <Link href="/#companies" className="transition hover:text-[var(--color-accent)]">
+            Browse Companies
+          </Link>
+          <Link href="/admin" className="transition hover:text-[var(--color-accent)]">
+            Admin
+          </Link>
+        </nav>
+
+        <div className="flex items-center gap-3">
           <Link
-            href="/"
-            className="rounded-full border border-black/10 px-4 py-2 transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            href="/admin"
+            className="text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-accent)]"
           >
-            Explore Jobs
+            Login
           </Link>
           <Link
             href="/admin"
-            className="rounded-full border border-black/10 px-4 py-2 transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            className="rounded-xl bg-[var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(92,88,248,0.28)] transition hover:bg-[var(--color-accent-strong)]"
           >
-            Admin Panel
+            Sign up
           </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

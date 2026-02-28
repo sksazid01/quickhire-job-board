@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { createJob, deleteJob, fetchJobs } from "@/lib/api";
+import { clearAdminSession, isAdminAuthenticated } from "@/lib/auth";
 import type { Job, JobPayload } from "@/lib/types";
 import { SiteHeader } from "@/components/site-header";
 
@@ -17,12 +19,28 @@ const initialFormState: JobPayload = {
 };
 
 export function AdminPage() {
+  const router = useRouter();
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [formState, setFormState] = useState<JobPayload>(initialFormState);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  // Auth guard — redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      router.replace("/admin/login");
+    } else {
+      setIsAuthChecked(true);
+    }
+  }, [router]);
+
+  function handleLogout() {
+    clearAdminSession();
+    router.replace("/admin/login");
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -93,11 +111,25 @@ export function AdminPage() {
     <div className="min-h-screen pb-16">
       <SiteHeader />
 
+      {!isAuthChecked ? (
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-black/10 border-t-[var(--color-accent)]" />
+        </div>
+      ) : (
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <section className="rounded-[36px] border border-black/8 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(223,236,255,0.92))] p-8 shadow-[0_24px_90px_rgba(16,24,40,0.08)]">
+          <div className="flex flex-wrap items-start justify-between gap-4">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--color-accent)]">
             Admin panel
           </p>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-[var(--color-muted)] transition hover:border-red-400 hover:text-red-600"
+          >
+            Sign out
+          </button>
+          </div>
           <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold leading-tight text-[var(--color-foreground)] md:text-5xl">
@@ -360,6 +392,7 @@ export function AdminPage() {
           </section>
         </section>
       </main>
+      )}
     </div>
   );
 }
