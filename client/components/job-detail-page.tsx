@@ -6,6 +6,7 @@ import { fetchJob } from "@/lib/api";
 import type { Job } from "@/lib/types";
 import { ApplicationForm } from "@/components/application-form";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 type JobDetailPageProps = {
   jobId: string;
@@ -168,6 +169,7 @@ export function JobDetailPage({ jobId }: JobDetailPageProps) {
           </div>
         ) : null}
       </main>
+      <SiteFooter />
     </div>
   );
 }
