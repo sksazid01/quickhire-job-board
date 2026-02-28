@@ -48,15 +48,15 @@ export function SiteFooter() {
           <p className="mt-4 text-sm leading-7 text-white/65">
             Subscribe for hiring updates and newly posted roles.
           </p>
-          <div className="mt-5 flex gap-3">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
               placeholder="Email address"
-              className="w-full rounded-xl border border-white/10 bg-white/8 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+              className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/8 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
             />
             <button
               type="button"
-              className="rounded-xl bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-white"
+              className="rounded-xl bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-white sm:px-5"
             >
               Subscribe
             </button>

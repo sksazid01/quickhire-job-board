@@ -11,6 +11,7 @@ import type { Job, JobMeta } from "@/lib/types";
 const emptyMeta: JobMeta = {
   categories: [],
   locations: [],
+  employment_types: [],
 };
 
 const defaultCategories = [
@@ -158,6 +159,7 @@ export function JobsHomePage() {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState("");
   const deferredSearch = useDeferredValue(search);
+  const isBackendUnavailable = error.includes("backend API is not connected");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -392,8 +394,8 @@ export function JobsHomePage() {
           </div>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {categoryCards.map((item, index) => {
-              const isHighlighted = index === 2;
+            {categoryCards.map((item) => {
+              const isHighlighted = category === item.name;
 
               return (
                 <button
@@ -445,7 +447,7 @@ export function JobsHomePage() {
 
         <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid overflow-hidden rounded-[30px] bg-[var(--color-accent)] text-white lg:grid-cols-[0.8fr_1.2fr]">
-            <div className="px-8 py-10 sm:px-10 sm:py-12">
+            <div className="relative z-10 select-text px-8 py-10 sm:px-10 sm:py-12">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
                 Recruiter CTA
               </p>
@@ -464,7 +466,7 @@ export function JobsHomePage() {
               </Link>
             </div>
 
-            <div className="relative min-h-[320px] bg-[linear-gradient(135deg,#eff1ff_0%,#ffffff_100%)] p-6">
+            <div className="pointer-events-none relative min-h-[320px] select-none bg-[linear-gradient(135deg,#eff1ff_0%,#ffffff_100%)] p-6">
               <div className="absolute left-6 right-6 top-8 rounded-[28px] bg-white p-4 shadow-[0_24px_50px_rgba(41,47,88,0.08)]">
                 <div className="grid gap-3 md:grid-cols-[1.3fr_repeat(2,0.8fr)]">
                   <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-3" />
@@ -575,7 +577,13 @@ export function JobsHomePage() {
           ) : null}
 
           {error ? (
-            <div className="mt-8 rounded-[24px] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+            <div
+              className={`mt-8 rounded-[24px] px-5 py-4 text-sm ${
+                isBackendUnavailable
+                  ? "border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)]"
+                  : "border border-red-200 bg-red-50 text-red-700"
+              }`}
+            >
               {error}
             </div>
           ) : null}

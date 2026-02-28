@@ -7,11 +7,35 @@ import type {
 } from "@/lib/types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
-  "http://localhost:4000";
+  (() => {
+    const rawValue = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+
+    if (!rawValue) {
+      return process.env.NODE_ENV === "development"
+        ? "http://localhost:4000"
+        : null;
+    }
+
+    const normalizedValue = rawValue.startsWith("http")
+      ? rawValue
+      : `https://${rawValue}`;
+
+    try {
+      return new URL(normalizedValue).toString().replace(/\/$/, "");
+    } catch {
+      return null;
+    }
+  })();
+
+const BACKEND_UNAVAILABLE_MESSAGE =
+  "Jobs are unavailable because the backend API is not connected for this deployment yet.";
 
 function buildUrl(path: string, params?: Record<string, string>) {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  if (!API_BASE_URL) {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
+
+  const url = new URL(path, API_BASE_URL);
 
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -25,13 +49,23 @@ function buildUrl(path: string, params?: Record<string, string>) {
 }
 
 async function request<T>(path: string, init?: RequestInit) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers || {}),
-    },
-  });
+  if (!API_BASE_URL) {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers || {}),
+      },
+    });
+  } catch {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
 
   const isJson = response.headers.get("content-type")?.includes("application/json");
   const data = isJson ? await response.json() : null;
@@ -55,7 +89,14 @@ export async function fetchJobs(filters: JobFilters, signal?: AbortSignal) {
   if (filters.sort) params.sort = filters.sort;
 
   const url = buildUrl("/api/jobs", params);
-  const response = await fetch(url, { signal, cache: "no-store" });
+
+  let response: Response;
+
+  try {
+    response = await fetch(url, { signal, cache: "no-store" });
+  } catch {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
 
   if (!response.ok) {
     throw new Error("Unable to load job listings.");
@@ -67,10 +108,20 @@ export async function fetchJobs(filters: JobFilters, signal?: AbortSignal) {
 }
 
 export async function fetchJob(jobId: string, signal?: AbortSignal) {
-  const response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}`, {
-    signal,
-    cache: "no-store",
-  });
+  if (!API_BASE_URL) {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}/api/jobs/${jobId}`, {
+      signal,
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error(BACKEND_UNAVAILABLE_MESSAGE);
+  }
 
   if (response.status === 404) {
     throw new Error("This job could not be found.");
