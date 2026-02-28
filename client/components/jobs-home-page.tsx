@@ -248,7 +248,7 @@ export function JobsHomePage() {
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
-              <div className="grid gap-3 md:grid-cols-[1.4fr_0.9fr_180px]">
+              <div className="grid gap-3 md:grid-cols-[1.4fr_0.85fr_0.85fr_180px]">
                 <input
                   type="search"
                   value={search}
@@ -265,6 +265,22 @@ export function JobsHomePage() {
                       : "border-[var(--color-line)]"
                   }`}
                 />
+                <select
+                  value={category}
+                  onChange={(event) => {
+                    setIsLoading(true);
+                    setError("");
+                    setCategory(event.target.value);
+                  }}
+                  className="rounded-2xl border border-[var(--color-line)] px-4 py-3.5 text-sm outline-none transition focus:border-[var(--color-accent)]"
+                >
+                  <option value="">All categories</option>
+                  {meta.categories.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
                 <select
                   value={location}
                   onChange={(event) => {
