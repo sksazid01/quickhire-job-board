@@ -1,30 +1,72 @@
 # QuickHire Job Board
 
-QuickHire is a simple full-stack job board built with Next.js on the frontend and Express with PostgreSQL on the backend. It supports job browsing, keyword/category/location filters, job details, application submission, and a lightweight admin workflow for adding or deleting listings.
+QuickHire is a full-stack job board built for the take-home task using:
 
-## Stack
+- `Next.js 16` for the frontend
+- `Express 5` for the backend API
+- `PostgreSQL` for persistence
 
-- Next.js 16 + React 19 + Tailwind CSS 4
-- Express 5
-- PostgreSQL via `pg`
+The application includes:
+
+- job listing with search and filters
+- job detail view
+- job application form
+- basic admin login and admin job management
+- PostgreSQL-backed jobs and applications API
 
 ## Project Structure
 
 - `client` - Next.js frontend
-- `server` - Express API and PostgreSQL integration
+- `server` - Express API, validation, and PostgreSQL integration
+- `instructions` - provided design/reference assets and task notes
 
-## Setup
+## Features
+
+### Frontend
+
+- landing page inspired by the provided QuickHire design assets
+- search by keyword
+- filter by category and location
+- featured jobs and latest jobs sections
+- job detail page at `/jobs/[id]`
+- application form with validation feedback
+- admin login page at `/admin/login`
+- admin panel at `/admin` for creating and deleting jobs
+
+### Backend
+
+- `GET /api/jobs`
+- `GET /api/jobs/meta`
+- `GET /api/jobs/:id`
+- `POST /api/jobs`
+- `DELETE /api/jobs/:id`
+- `POST /api/applications`
+
+### Database
+
+- PostgreSQL tables are auto-created on server startup
+- sample jobs are seeded only if the jobs table is empty
+- applications are linked to jobs with a foreign key
+
+## Local Setup
 
 ### 1. Backend
 
-Copy `server/.env.example` to `server/.env` and set the actual `DATABASE_URL`:
+Create a backend env file from the example:
 
 ```bash
 cp server/.env.example server/.env
-# Edit server/.env and fill in DATABASE_URL
 ```
 
-Then start the server:
+Required backend environment variables:
+
+```env
+PORT=4000
+DATABASE_URL=postgres://...
+CORS_ORIGIN=http://localhost:3000
+```
+
+Then install and run the server:
 
 ```bash
 cd server
@@ -32,26 +74,27 @@ npm install
 npm run dev
 ```
 
-The API runs on `http://localhost:4000`.
+Backend runs on:
 
-Available endpoints:
-
-- `GET /api/jobs` — list all jobs (supports `?search=`, `?category=`, `?location=`)
-- `GET /api/jobs/meta` — distinct categories and locations
-- `GET /api/jobs/:id` — single job detail
-- `POST /api/jobs` — create a job listing
-- `DELETE /api/jobs/:id` — delete a job listing
-- `POST /api/applications` — submit a job application
+```txt
+http://localhost:4000
+```
 
 ### 2. Frontend
 
-Copy `client/.env.local.example` to `client/.env.local`:
+Create a frontend env file from the example:
 
 ```bash
 cp client/.env.local.example client/.env.local
 ```
 
-Then start the frontend:
+Required frontend environment variable:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+```
+
+Then install and run the frontend:
 
 ```bash
 cd client
@@ -59,22 +102,77 @@ npm install
 npm run dev
 ```
 
-The frontend runs on `http://localhost:3000`.
+Frontend runs on:
 
-## Admin Panel
+```txt
+http://localhost:3000
+```
 
-The admin panel is accessible at `/admin`. It is protected by a simple login:
+## Admin Access
 
-| Field    | Value           |
-|----------|-----------------|
-| Username | `admin`         |
+The admin panel uses a simple client-side session for this task.
+
+| Field | Value |
+| --- | --- |
+| Username | `admin` |
 | Password | `quickhire2024` |
 
-After signing in, you can add new job listings and delete existing ones. The session is stored in `sessionStorage` and clears when the browser tab is closed.
+After login, the session is stored in `sessionStorage`.
+
+## Deployment Status
+
+Current status:
+
+- frontend is deployed
+- backend is not deployed yet
+
+Important note:
+
+- the live frontend alone is not enough for full functionality
+- job listing, job detail, application submission, and admin create/delete actions require the backend API to be deployed and reachable
+- after backend deployment, `NEXT_PUBLIC_API_BASE_URL` must point to the public backend URL
+- backend `CORS_ORIGIN` must be updated to the deployed frontend domain
+
+Example production values:
+
+```env
+# frontend
+NEXT_PUBLIC_API_BASE_URL=https://your-backend-domain.com
+
+# backend
+CORS_ORIGIN=https://your-frontend-domain.vercel.app
+```
+
+## Verification
+
+Verified locally with:
+
+- `npm run lint` in `client`
+- `npx next build --webpack` in `client`
+- `npm run check` in `server`
+- backend startup against PostgreSQL
+- `GET /api/health`
+- `GET /api/jobs`
+
+## Submission Notes
+
+Per the task instructions, submission should include:
+
+- public GitHub repository link
+- short Loom or screen-recorded demo
+- live link, if available
+
+Suggested demo flow:
+
+- browse job listings
+- open a job detail page
+- submit an application
+- log in to admin
+- create a job
+- delete a job
 
 ## Notes
 
-- The backend creates the required PostgreSQL tables on startup if they do not exist.
-- Sample jobs are seeded only when the `jobs` table is empty.
-- CORS is configurable through `CORS_ORIGIN` in `server/.env`.
-- `.env` and `.env.local` files are excluded from version control via `.gitignore`.
+- `.env` files are gitignored
+- the UI uses the provided assets from the `instructions` directory as visual reference
+- the large provided SVG is included in the frontend as a design/reference asset
