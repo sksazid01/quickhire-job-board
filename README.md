@@ -64,7 +64,10 @@ Required backend environment variables:
 PORT=4000
 DATABASE_URL=postgres://...
 CORS_ORIGIN=http://localhost:3000
+ADMIN_SECRET=quickhire-admin-secret
 ```
+
+> `ADMIN_SECRET` is checked against the `X-Admin-Key` header on `POST /api/jobs` and `DELETE /api/jobs/:id`. Requests without a matching key receive a `401 Unauthorized` response.
 
 Then install and run the server:
 
@@ -92,7 +95,10 @@ Required frontend environment variable:
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_ADMIN_KEY=quickhire-admin-secret
 ```
+
+> `NEXT_PUBLIC_ADMIN_KEY` must match the backend `ADMIN_SECRET` so the admin panel can create and delete jobs.
 
 Then install and run the frontend:
 
